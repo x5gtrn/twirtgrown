@@ -27,13 +27,13 @@ public class Twirtgrown {
 			
 			// first time
 			statuses = twitter.getFriendsTimeline();
-			long lastSendedId = sendToGrowlInAscOrder(statuses);
+			long lastSendedId = sendToGrowlInAscOrder(statuses, 0L);
 			
 			// second time or later
 			while (true) {
 				statuses = getNewTimeline(twitter, lastSendedId);
 				if (statuses.size() > 0) {
-					lastSendedId = sendToGrowlInAscOrder(statuses);
+					lastSendedId = sendToGrowlInAscOrder(statuses, lastSendedId);
 				} else {
 					// if no new tweets at timeline, wait DELY_TIME and continue.
 					try {
@@ -82,10 +82,12 @@ public class Twirtgrown {
 		return newTimeLine;
 	}
 	
-	private long sendToGrowlInAscOrder(List<Status> statuses) {
+	private long sendToGrowlInAscOrder(List<Status> statuses, long lastSendedId) {
 		Collections.reverse(statuses);
-		long lastSendedId = 0L;
 		for (Status status : statuses) {
+			if (status.getId() == lastSendedId) {
+				continue;
+			}
 			String name = status.getUser().getName();
 			String text = status.getText();
 			if (name == null || text == null) {
