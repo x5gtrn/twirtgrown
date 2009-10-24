@@ -9,6 +9,10 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import la.asuo.twirtgrown.util.GrowlUtil;
+import la.asuo.twirtgrown.util.Util;
+
+import org.apache.log4j.Logger;
+
 import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -19,6 +23,8 @@ public class Twirtgrown {
 	public static final int DELAY_TIME = 180 * 1000;	// milliseconds
 	public static final int SLEEP_MINUTES = 10;	// minutes
 	
+	Logger logger = Logger.getLogger(Main.APP_NAME);
+	
 	public void proceed(String id, String pass) {
 		List<Status> statuses = null;
 		Twitter twitter;
@@ -26,12 +32,15 @@ public class Twirtgrown {
 			twitter = new Twitter(id, pass);
 			
 			// first time
+			logger.info("getting timeline first time.");
 			statuses = twitter.getFriendsTimeline();
 			long lastSendedId = sendToGrowlInAscOrder(statuses, 0L);
 			
 			// second time or later
 			while (true) {
+				logger.debug("getting new timeline...");
 				statuses = getNewTimeline(twitter, lastSendedId);
+				logger.info("getting new timeline. statuses's count=" + statuses.size());
 				if (statuses.size() > 0) {
 					lastSendedId = sendToGrowlInAscOrder(statuses, lastSendedId);
 				} else {
@@ -39,13 +48,14 @@ public class Twirtgrown {
 					try {
 						Thread.sleep(DELAY_TIME);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						logger.error("InterruptedException.", e);
 					}
 				}
 			}
 		} catch (TwitterException e) {
 			// TODO check other Exception from Twitter.
 			if (e.getMessage().indexOf("Rate limit") > 0) {
+				logger.warn("TwitterException. Rate limit exceeded.");
 				GrowlUtil growl = GrowlUtil.getInstance();
 				growl.sendNotification(
 						Main.APP_NAME,
@@ -54,13 +64,16 @@ public class Twirtgrown {
 				try {
 					Thread.sleep(SLEEP_MINUTES + 60 * 1000);
 				} catch (InterruptedException ie) {
-					ie.printStackTrace();
+					logger.error("InterruptedException.", ie);
 				}
+				logger.info("proceed again.");
 				proceed(id, pass);
 			} else {
-				e.printStackTrace();
+				logger.error("TwitterException.", e);
 			}
 			System.exit(1);
+		} catch (Throwable t) {
+			logger.error("error occured in proceed. ", t);
 		}
 	}
 	
@@ -86,6 +99,11 @@ public class Twirtgrown {
 		Collections.reverse(statuses);
 		for (Status status : statuses) {
 			if (status.getId() == lastSendedId) {
+				logger.debug("DUPLICATE!: " + lastSendedId);
+				continue;
+			}
+			if (status.getId() < lastSendedId) {
+				logger.debug("LOW ID! ignore: " + lastSendedId);
 				continue;
 			}
 			String name = status.getUser().getName();
@@ -106,14 +124,15 @@ public class Twirtgrown {
 				try {
 					Thread.sleep(diffTime);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					logger.error("InterruptedException.", e);
 				}
 			}
 			GrowlUtil growl = GrowlUtil.getInstance();
 			growl.sendNotification(name, text, icon);
 			lastSendedId = status.getId();
+			
+			logger.debug("send status createdAt: " + Util.getTime(status.getCreatedAt()));
 		}
 		return lastSendedId;
 	}
-
 }

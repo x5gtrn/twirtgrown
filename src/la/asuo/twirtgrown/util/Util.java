@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Util {
 	private Util() {}
@@ -36,5 +38,13 @@ public class Util {
 			}
 		}
 		return idPass;
+	}
+	
+	public static String getTime() {
+		return getTime(Calendar.getInstance().getTime());
+	}
+	
+	public static String getTime(Date date) {
+		return date.toString();
 	}
 }
