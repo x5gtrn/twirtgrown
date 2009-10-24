@@ -22,6 +22,7 @@ import twitter4j.User;
 public class Twirtgrown {
 	public static final int DELAY_TIME = 180 * 1000;	// milliseconds
 	public static final int SLEEP_MINUTES = 10;	// minutes
+	public static final int IGNORE_DIFF_SECONDS = 10; // seconds
 	
 	Logger logger = Logger.getLogger(Main.APP_NAME);
 	
@@ -62,7 +63,7 @@ public class Twirtgrown {
 						"Rate limit exceeded.\n"
 						+ Main.APP_NAME + " will sleep " + SLEEP_MINUTES + " min.");
 				try {
-					Thread.sleep(SLEEP_MINUTES + 60 * 1000);
+					Thread.sleep(SLEEP_MINUTES * 60 * 1000);
 				} catch (InterruptedException ie) {
 					logger.error("InterruptedException.", ie);
 				}
@@ -82,11 +83,17 @@ public class Twirtgrown {
 		int page = 1;
 		Paging paging = new Paging();
 		paging.setCount(20);
-		paging.setSinceId(sinceId);
+		if (sinceId != 0L) {
+			paging.setSinceId(sinceId);
+		}
 		while (true) {
 			paging.setPage(page++);
 			List<Status> statuses = twitter.getFriendsTimeline(paging);
 			if (statuses.size() > 0) {
+				if ((statuses.get(0).getCreatedAt().getTime() + DELAY_TIME) - System.currentTimeMillis() < 0) {
+					logger.warn("older status before DELAY_TIME. rest are ignored.");
+					break;
+				}
 				newTimeLine.addAll(statuses);
 			} else {
 				break;
@@ -126,6 +133,9 @@ public class Twirtgrown {
 				} catch (InterruptedException e) {
 					logger.error("InterruptedException.", e);
 				}
+			} else if (diffTime < IGNORE_DIFF_SECONDS * -1000){
+				logger.warn("time-lag over IGNORE_DIFF_SEC! ignore: diffTime=" + diffTime);
+				continue;
 			}
 			GrowlUtil growl = GrowlUtil.getInstance();
 			growl.sendNotification(name, text, icon);
