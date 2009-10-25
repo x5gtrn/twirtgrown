@@ -6,19 +6,25 @@ import info.growl.GrowlUtils;
 
 import java.awt.image.RenderedImage;
 
+import la.asuo.twirtgrown.Main;
+
+import org.apache.log4j.Logger;
+
 public class GrowlUtil {
 
 	private static GrowlUtil instance = null;
-	private static final String GROWL_NOTIFICATION_NAME  = "NN";	// TODO Change growl name.
+	private static final String GROWL_NOTIFICATION_NAME  = Main.APP_NAME + "GNN";
 	private Growl growl;
 	
+	Logger logger = Logger.getLogger(Main.APP_NAME);
+	
 	private GrowlUtil() {
-		growl = GrowlUtils.getGrowlInstance("twirtgrown");
+		growl = GrowlUtils.getGrowlInstance(Main.APP_NAME);
 		growl.addNotification(GROWL_NOTIFICATION_NAME, true);
 		try {
 			growl.register();
 		} catch (GrowlException e) {
-			e.printStackTrace();
+			logger.error("GrowlException", e);
 		}
 	}
 	
@@ -33,7 +39,7 @@ public class GrowlUtil {
 		try {
 			growl.sendNotification(GROWL_NOTIFICATION_NAME, title, body);
 		} catch (GrowlException e) {
-			e.printStackTrace();
+			logger.error("GrowlException", e);
 		}
 	}
 	
@@ -44,7 +50,7 @@ public class GrowlUtil {
 			try {
 				growl.sendNotification(GROWL_NOTIFICATION_NAME, title, body, icon);
 			} catch (GrowlException e) {
-				e.printStackTrace();
+				logger.error("GrowlException", e);
 			}
 		}
 	}

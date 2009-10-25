@@ -25,23 +25,25 @@ public class Twirtgrown {
 	public static final int IGNORE_DIFF_SECONDS = 10; // seconds
 	
 	Logger logger = Logger.getLogger(Main.APP_NAME);
+	GrowlUtil growl = GrowlUtil.getInstance();
 	
 	public void proceed(String id, String pass) {
-		List<Status> statuses = null;
+		List<Status> statuses;
 		Twitter twitter;
 		try {
 			twitter = new Twitter(id, pass);
 			
 			// first time
-			logger.info("getting timeline first time.");
+			logger.debug("getting timeline first time.");
 			statuses = twitter.getFriendsTimeline();
+			logger.debug("getting timeline first time. statuses's count=" + statuses.size());
 			long lastSendedId = sendToGrowlInAscOrder(statuses, 0L);
 			
 			// second time or later
 			while (true) {
 				logger.debug("getting new timeline...");
 				statuses = getNewTimeline(twitter, lastSendedId);
-				logger.info("getting new timeline. statuses's count=" + statuses.size());
+				logger.debug("getting new timeline. statuses's count=" + statuses.size());
 				if (statuses.size() > 0) {
 					lastSendedId = sendToGrowlInAscOrder(statuses, lastSendedId);
 				} else {
@@ -57,7 +59,6 @@ public class Twirtgrown {
 			// TODO check other Exception from Twitter.
 			if (e.getMessage().indexOf("Rate limit") > 0) {
 				logger.warn("TwitterException. Rate limit exceeded.");
-				GrowlUtil growl = GrowlUtil.getInstance();
 				growl.sendNotification(
 						Main.APP_NAME,
 						"Rate limit exceeded.\n"
@@ -67,7 +68,7 @@ public class Twirtgrown {
 				} catch (InterruptedException ie) {
 					logger.error("InterruptedException.", ie);
 				}
-				logger.info("proceed again.");
+				logger.debug("proceed again.");
 				proceed(id, pass);
 			} else {
 				logger.error("TwitterException.", e);
@@ -106,11 +107,11 @@ public class Twirtgrown {
 		Collections.reverse(statuses);
 		for (Status status : statuses) {
 			if (status.getId() == lastSendedId) {
-				logger.debug("DUPLICATE!: " + lastSendedId);
+				logger.debug("status id is DUPLICATE!");
 				continue;
 			}
 			if (status.getId() < lastSendedId) {
-				logger.debug("LOW ID! ignore: " + lastSendedId);
+				logger.debug("status id is LOW!");
 				continue;
 			}
 			String name = status.getUser().getName();
@@ -134,14 +135,14 @@ public class Twirtgrown {
 					logger.error("InterruptedException.", e);
 				}
 			} else if (diffTime < IGNORE_DIFF_SECONDS * -1000){
-				logger.warn("time-lag over IGNORE_DIFF_SEC! ignore: diffTime=" + diffTime);
+				logger.warn("time-lag over IGNORE_DIFF_SEC! status isn't sended. diffTime=" + diffTime);
 				continue;
 			}
-			GrowlUtil growl = GrowlUtil.getInstance();
 			growl.sendNotification(name, text, icon);
 			lastSendedId = status.getId();
+			icon = null;
 			
-			logger.debug("send status createdAt: " + Util.getTime(status.getCreatedAt()));
+			logger.debug("status sended. createdAt: " + Util.getTime(status.getCreatedAt()));
 		}
 		return lastSendedId;
 	}
