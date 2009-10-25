@@ -1,12 +1,9 @@
 package la.asuo.twirtgrown;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import la.asuo.twirtgrown.util.GrowlUtil;
 import la.asuo.twirtgrown.util.Util;
@@ -17,7 +14,6 @@ import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.User;
 
 public class Twirtgrown {
 	public static final int DELAY_TIME = 180 * 1000;	// milliseconds
@@ -119,14 +115,6 @@ public class Twirtgrown {
 			if (name == null || text == null) {
 				continue;
 			}
-			User user = status.getUser();
-			BufferedImage icon;
-			try {
-				icon = ImageIO.read(user.getProfileImageURL().openStream());
-			} catch (IOException e) {
-				icon = null;
-			}
-			
 			long diffTime = (status.getCreatedAt().getTime() + DELAY_TIME) - System.currentTimeMillis();
 			if (diffTime > 0) {
 				try {
@@ -138,6 +126,8 @@ public class Twirtgrown {
 				logger.warn("time-lag over IGNORE_DIFF_SEC! status isn't sended. diffTime=" + diffTime);
 				continue;
 			}
+			BufferedImage icon = Util.getBufferedImage(status.getUser().getProfileImageURL());
+			
 			growl.sendNotification(name, text, icon);
 			lastSendedId = status.getId();
 			icon = null;
