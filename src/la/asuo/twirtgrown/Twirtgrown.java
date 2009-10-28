@@ -126,11 +126,10 @@ public class Twirtgrown {
 				logger.warn("time-lag over IGNORE_DIFF_SEC! status isn't sended. diffTime=" + diffTime);
 				continue;
 			}
-			BufferedImage icon = Util.getBufferedImage(status.getUser().getProfileImageURL());
 			
+			BufferedImage icon = IconImages.getInstance().getIcon(status.getUser());
 			growl.sendNotification(name, text, icon);
 			lastSendedId = status.getId();
-			icon = null;
 			
 			logger.debug("status sended. createdAt: " + Util.getTime(status.getCreatedAt()));
 		}

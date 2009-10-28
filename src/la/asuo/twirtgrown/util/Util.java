@@ -1,16 +1,11 @@
 package la.asuo.twirtgrown.util;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
-
-import javax.imageio.ImageIO;
 
 public class Util {
 	private Util() {}
@@ -51,28 +46,5 @@ public class Util {
 	
 	public static String getTime(Date date) {
 		return date.toString();
-	}
-	
-	public static BufferedImage getBufferedImage(URL url) {
-		InputStream in = null;
-		BufferedImage image;
-		if (ImageIO.getUseCache()) {
-			ImageIO.setUseCache(false);
-		}
-		try {
-			in = url.openStream();
-			image = ImageIO.read(in);
-		} catch (IOException e) {
-			image = null;
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (Exception e) {
-					// ignore
-				}
-			}
-		}
-		return image;
 	}
 }
