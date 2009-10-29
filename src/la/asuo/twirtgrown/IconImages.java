@@ -2,7 +2,6 @@ package la.asuo.twirtgrown;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,30 +42,16 @@ public class IconImages {
 		return (BufferedImage) imageMap.get(String.valueOf(userId));
 	}
 	
-	private boolean addImage(String strUserId, URL url) {
+	private void addImage(String strUserId, URL url) {
 		imageMap.remove(strUserId);
-		InputStream in = null;
-		BufferedImage image;
-		if (ImageIO.getUseCache()) {
-			ImageIO.setUseCache(false);
+		if (!ImageIO.getUseCache()) {
+			ImageIO.setUseCache(true);
 		}
 		try {
-			in = url.openStream();
-			image = ImageIO.read(in);
-			image.flush();
+			imageMap.put(strUserId, ImageIO.read(url));
 		} catch (IOException e) {
-			image = null;
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (Exception e) {
-					// ignore
-				}
-			}
+			imageMap.put(strUserId, null);
 		}
-		imageMap.put(strUserId, image);
 		logger.debug("ADD new icon image. size=" + imageMap.size());
-		return image != null;
 	}
 }
