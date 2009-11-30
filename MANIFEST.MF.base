@@ -1,0 +1,2 @@
+Main-Class: la.asuo.twirtgrown.Main
+Class-Path: lib/Growl.jar lib/twitter4j-2.0.9.jar

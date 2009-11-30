@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="twirtgrown" default="jar" basedir=".">
+	<property name="app.name" value="twirtgrown" />
+	<property name="build.dir" value="bin" />
+	<property name="src.dir" value="src" />
+	<property name="jar.name" value="twirtgrown.jar" />
+	<property name="jar.dir" value="${app.name}.app/Contents/Resources/Java" />
+	<property name="lib.dir" value="lib" />
+	<property name="doc.dir" value="doc" />
+
+	<target name="prepare">
+		<tstamp>
+			<format property="ts" pattern="yyyyMMdd-HHmmss-z" />
+		</tstamp>
+		<delete dir="${build.dir}" />
+		<mkdir dir="${build.dir}" />
+	</target>
+	
+	<target name="compile" depends="prepare">
+		<javac srcdir="${src.dir}" destdir="${build.dir}">
+			<classpath>
+				<fileset dir="${lib.dir}" includes="*.jar" />
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<jar jarfile="${jar.dir}/${jar.name}" basedir="${build.dir}" manifest="MANIFEST.MF.base">
+			<manifest>
+				<attribute name="Build-Id" value="${ts} (${user.name} [${os.name} ${os.version} ${os.arch}])" />
+			</manifest>
+		</jar>
+		<copy todir="${jar.dir}/lib">
+			<fileset dir="lib" />
+		</copy>
+	</target>
+	
+	<target name="javadoc">
+		<javadoc destdir="${doc.dir}">
+			<fileset dir="${src.dir}" />
+		</javadoc>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${jar.dir}" />
+		<delete dir="${doc.dir}" />
+	</target>
+</project>

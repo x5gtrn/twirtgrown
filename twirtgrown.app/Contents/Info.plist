@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<string>true</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>Japanese</string>
+	<key>CFBundleExecutable</key>
+	<string>JavaApplicationStub</string>
+	<key>CFBundleGetInfoString</key>
+	<string>(c)2009 x5gtrn http://x5gt.rn.asuo.la/jp/</string>
+	<key>CFBundleIconFile</key>
+	<string>twirtgrown_icon1.icns</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>twirtgrown</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.10</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.10</string>
+	<key>LSHasLocalizedDisplayName</key>
+	<false/>
+	<key>LSUIElement</key>
+	<string>1</string>
+	<key>NSAppleScriptEnabled</key>
+	<false/>
+	<key>Java</key>
+	<dict>
+		<key>ClassPath</key>
+		<array>
+			<string>$JAVAROOT/twirtgrown.jar</string>
+			<string>$JAVAROOT/lib/Growl.jar</string>
+			<string>$JAVAROOT/lib/twitter4j-2.0.9.jar</string>
+			<string>$JAVAROOT/lib/log4j-1.2.15.jar</string>
+		</array>
+		<key>VMOptions</key>
+		<array>
+			<string>-Djava.library.path=lib</string>
+			<string>-Xmx64m</string>
+		</array>
+		<key>JVMVersion</key>
+		<string>1.5*</string>
+		<key>MainClass</key>
+		<string>la.asuo.twirtgrown.Main</string>
+		<key>Properties</key>
+		<dict>
+			<key>apple.awt.brushMetalLook</key>
+			<string>false</string>
+			<key>apple.awt.showGrowBox</key>
+			<string>true</string>
+			<key>apple.laf.useScreenMenuBar</key>
+			<string>true</string>
+			<key>apple.awt.graphics.UseQuartz</key>
+			<string>true</string>
+		</dict>
+		<key>WorkingDirectory</key>
+		<string>$APP_PACKAGE/Contents/Resources/Java</string>
+	</dict>
+</dict>
+</plist>
